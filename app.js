@@ -6,6 +6,7 @@ const app = express();
 const mongoose = require('mongoose');
 
 app.use(express.static('public'));
+app.use(express.json());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
