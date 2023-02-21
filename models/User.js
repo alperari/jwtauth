@@ -32,6 +32,25 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
+// Static methods
+userSchema.static.login = async function (email, password) {
+  const user = await this.findOne({ email: email });
+
+  if (user) {
+    const isMatched = bcrypt.compare(email, user.email);
+
+    if (isMatched) {
+      return user;
+    } else {
+      // Wrong password
+      // TODO
+    }
+  } else {
+    // Email is not registered
+    // TODO
+  }
+};
+
 const User = mongoose.model('user', userSchema);
 
 module.exports = User;

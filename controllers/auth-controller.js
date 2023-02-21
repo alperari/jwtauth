@@ -39,6 +39,7 @@ module.exports.signup_post = async (req, res) => {
   try {
     const user = await User.create({ email: email, password: password });
 
+    // Create jwt token on signup and redirect to home view
     const token = generateToken(user.id);
 
     res.cookie('token', token, {
@@ -46,11 +47,10 @@ module.exports.signup_post = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return res.status(201).send(user);
+    return res.status(201).json({ id: user.id });
   } catch (err) {
     const errors = errorHandler(err);
-    console.log(err.message);
-    return res.status(400).send(errors);
+    return res.status(400).send({ errors: errors });
   }
 };
 
@@ -63,5 +63,15 @@ module.exports.login_post = async (req, res) => {
 
   if (!email || !password) res.status(400).send('Invalid inputs');
 
-  res.send('2');
+  try {
+    // Use mongoose static login method
+    const user = await User.login({ email: email, password: password });
+
+    return res.status(201).json({ id: user.id });
+  } catch (err) {
+    const errors = {};
+    return res.status(400).send({ errors: errors });
+  }
+
+  // Create jwt token on login and redirect to home view
 };
