@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-const errorHandler = (err) => {
+const handleErrors = (err) => {
   const errors = { email: '', password: '' };
 
   if (err.code === 11000) errors['email'] = 'Email already exists!';
@@ -10,6 +10,13 @@ const errorHandler = (err) => {
     Object.values(err.errors).forEach(({ properties }) => {
       errors[properties.path] = properties.message;
     });
+  }
+
+  if (err.message.includes('email')) {
+    errors['email'] = err.message;
+  }
+  if (err.message.includes('password')) {
+    errors['password'] = err.message;
   }
 
   return errors;
@@ -43,14 +50,14 @@ module.exports.signup_post = async (req, res) => {
     const token = generateToken(user.id);
 
     res.cookie('token', token, {
-      httpOnly: true,
+      // httpOnly: true,  //if true: frontend cannot read token from cookies
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    return res.status(201).json({ id: user.id });
+    res.status(201).json({ id: user.id });
   } catch (err) {
-    const errors = errorHandler(err);
-    return res.status(400).send({ errors: errors });
+    const errors = handleErrors(err);
+    res.status(400).send({ errors: errors });
   }
 };
 
@@ -67,11 +74,19 @@ module.exports.login_post = async (req, res) => {
     // Use mongoose static login method
     const user = await User.login(email, password);
 
-    return res.status(201).json({ id: user.id });
+    const token = generateToken(user.id);
+
+    res.cookie('token', token, {
+      // httpOnly: true,  //if true: frontend cannot read token from cookies
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(201).json({ id: user.id });
   } catch (err) {
-    console.log('err:', err);
-    const errors = {};
-    return res.status(400).send({ errors: errors });
+    // If .login static method fails to match password, it will throw an error.
+    // Otherwise, it will return user
+    const errors = handleErrors(err);
+    res.status(400).send({ errors: errors });
   }
 
   // Create jwt token on login and redirect to home view

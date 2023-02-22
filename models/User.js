@@ -57,7 +57,7 @@ userSchema.statics.login = async function (email, password) {
     }
   } else {
     // Email is not registered
-    throw Error('There is no such registered user!');
+    throw Error('There is no such registered email!');
   }
 };
 

@@ -1,0 +1,30 @@
+<%- include('partials/header'); -%>
+<h1>Protected Content</h1>
+
+<div
+  style="
+    padding: 20px 0px 20px 0px;
+    flex-direction: row;
+    display: flex;
+    align-items: flex-start;
+    justify-content: start;
+  "
+>
+  <span>Your token is:</span>
+  <div
+    style="
+      width: 300px;
+      margin-left: 10px;
+      border: 1px solid green;
+      padding: 10px;
+      word-wrap: break-word;
+      display: inline-block;
+    "
+    class="token"
+  ></div>
+</div>
+
+<script>
+  const token = document.cookie.split('=')[1];
+  document.querySelector('.token').textContent += token;
+</script>

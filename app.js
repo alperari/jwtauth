@@ -6,6 +6,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+const { requireAuth } = require('./middlewares/auth-middleware');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -24,16 +25,14 @@ mongoose
     console.log('listening on port:', PORT);
 
     // Base
-    app.get('/', (req, res) => {
-      res.render('home', {
-        title: 'Home Page',
-      });
-    });
 
     // Routes Here
     const authRouter = require('./routes/auth-routes');
 
     app.use(authRouter);
+
+    app.get('/', (req, res) => res.render('home'));
+    app.get('/content', requireAuth, (req, res) => res.render('content'));
   })
   .catch((error) => {
     console.log(error);
