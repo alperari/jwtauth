@@ -91,3 +91,8 @@ module.exports.login_post = async (req, res) => {
 
   // Create jwt token on login and redirect to home view
 };
+
+module.exports.logout_get = (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
+};

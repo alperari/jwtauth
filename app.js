@@ -6,7 +6,9 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const { requireAuth } = require('./middlewares/auth-middleware');
+
+// Middlewares
+const { requireAuth, checkUser } = require('./middlewares/auth-middleware');
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -29,10 +31,10 @@ mongoose
     // Routes Here
     const authRouter = require('./routes/auth-routes');
 
-    app.use(authRouter);
-
+    app.get('*', checkUser);
     app.get('/', (req, res) => res.render('home'));
     app.get('/content', requireAuth, (req, res) => res.render('content'));
+    app.use(authRouter);
   })
   .catch((error) => {
     console.log(error);
