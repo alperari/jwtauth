@@ -65,10 +65,11 @@ module.exports.login_post = async (req, res) => {
 
   try {
     // Use mongoose static login method
-    const user = await User.login({ email: email, password: password });
+    const user = await User.login(email, password);
 
     return res.status(201).json({ id: user.id });
   } catch (err) {
+    console.log('err:', err);
     const errors = {};
     return res.status(400).send({ errors: errors });
   }

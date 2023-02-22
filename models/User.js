@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { isEmail } = require('validator');
 
+// Check out validation basics https://mongoosejs.com/docs/validation.html
+
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -14,6 +16,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide password!'],
     minLength: [6, 'Password length cannot be less than 6!'],
+  },
+  createdAt: {
+    type: Date,
+    immutable: true,
+    default: () => Date.now(),
+  },
+  createdAt: {
+    type: Date,
+    default: () => Date.now(),
   },
 });
 
@@ -33,21 +44,20 @@ userSchema.post('save', function (doc, next) {
 });
 
 // Static methods
-userSchema.static.login = async function (email, password) {
-  const user = await this.findOne({ email: email });
+userSchema.statics.login = async function (email, password) {
+  const user = await this.findOne({ email });
 
   if (user) {
-    const isMatched = bcrypt.compare(email, user.email);
-
+    const isMatched = await bcrypt.compare(password, user.password);
     if (isMatched) {
       return user;
     } else {
       // Wrong password
-      // TODO
+      throw Error('Wrong password!');
     }
   } else {
     // Email is not registered
-    // TODO
+    throw Error('There is no such registered user!');
   }
 };
 
